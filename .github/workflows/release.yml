@@ -61,7 +61,7 @@ jobs:
           rm -rf stage
           mkdir -p "$STAGE"
           cp -r META-INF "$STAGE/"
-          cp customize.sh module.prop service.sh "$STAGE/"
+          cp customize.sh module.prop service.sh action.sh "$STAGE/"
           cp build/main-* "$STAGE/"
           ( cd "$STAGE" && zip -r9 "$GITHUB_WORKSPACE/RootSnitch-v${VERSION}.zip" . )
           ls -lh "RootSnitch-v${VERSION}.zip"

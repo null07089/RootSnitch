@@ -2,6 +2,12 @@
 
 本项目遵循 [语义化版本](https://semver.org/lang/zh-CN/) 与 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.1.0/) 规范。
 
+## [1.2] - 2026-10-06
+
+### 新增
+- 新增 `action.sh`：在 KernelSU / APatch 中点击模块“操作”按钮时，解除隐藏进程的挂载，并列出持有 socket 的 root 进程。
+- 已将其清理为纯 POSIX `sh`（原脚本依赖 bash 数组与 `[[ =~ ]]`，且内嵌了 MT 管理器终端的环境封装，无法直接运行）。
+
 ## [1.1] - 2026-10-06
 
 ### 修复
@@ -22,5 +28,6 @@
 - 支持按架构（`arm64` / `arm` / `x86_64` / `x86`）编译与安装。
 - 支持 Magisk 在线更新（`updateJson`）。
 
+[1.2]: https://github.com/null07089/RootSnitch/releases/tag/v1.2
 [1.1]: https://github.com/null07089/RootSnitch/releases/tag/v1.1
 [1.0]: https://github.com/null07089/RootSnitch/releases/tag/v1.0

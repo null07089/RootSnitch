@@ -42,6 +42,15 @@ touch /data/adb/modules/RootSnitch/disable   # 暂停
 rm /data/adb/modules/RootSnitch/disable      # 恢复
 ```
 
+## 操作按钮（KernelSU / APatch）
+
+在 KernelSU / APatch 的模块页面点 RootSnitch 的「操作」按钮，会运行 `action.sh`：
+
+1. 解除用于隐藏进程的 `/proc/<pid>` 挂载
+2. 列出处于 `su` / `ksu` / `magisk` 域且持有 socket 的进程
+
+Magisk 没有操作按钮，此脚本会被忽略。
+
 ## 自己编译
 
 需要 Android NDK（示例 r26b）。
@@ -59,6 +68,7 @@ bash scripts/build.sh
 RootSnitch/
 ├── main.cpp          # 监控程序源码
 ├── service.sh        # 开机启动，按 ABI 选择并运行二进制
+├── action.sh         # KernelSU/APatch 的“操作”按钮脚本
 ├── customize.sh      # 安装时选架构、授权通知助手
 ├── module.prop       # 模块信息（含 updateJson）
 ├── update.json       # Magisk 在线更新清单
