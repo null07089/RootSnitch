@@ -2,6 +2,8 @@ SKIPUNZIP=1
 
 unzip -o "$ZIPFILE" 'module.prop' -d "$MODPATH" >&2
 unzip -o "$ZIPFILE" 'service.sh' -d "$MODPATH" >&2
+unzip -o "$ZIPFILE" 'action.sh' -d "$MODPATH" >&2
+chmod 0755 "$MODPATH/action.sh"
 
 case "$ARCH" in
   arm64) BIN=main-arm64 ;;
