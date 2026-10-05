@@ -1,0 +1,5 @@
+blank_issues_enabled: false
+contact_links:
+  - name: 提问与讨论
+    url: https://github.com/null07089/RootSnitch/discussions
+    about: 一般性使用问题请在 Discussions 中讨论

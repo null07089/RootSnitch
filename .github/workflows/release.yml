@@ -1,0 +1,110 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "已存在的标签（例如 v1.0）"
+        required: true
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    name: Build & publish release
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout (tag)
+        uses: actions/checkout@v4
+
+      - name: Resolve version
+        id: meta
+        run: |
+          set -euo pipefail
+          REF="${{ github.ref_name }}"
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            REF="${{ github.event.inputs.tag }}"
+          fi
+          VERSION="${REF#v}"
+          PROP_VERSION="$(sed -n 's/^version=//p' module.prop)"
+          VERSION_CODE="$(sed -n 's/^versionCode=//p' module.prop)"
+          if [ "$VERSION" != "$PROP_VERSION" ]; then
+            echo "错误: 标签 ($REF) 与 module.prop 中的 version ($PROP_VERSION) 不一致" >&2
+            exit 1
+          fi
+          {
+            echo "version=$VERSION"
+            echo "version_code=$VERSION_CODE"
+            echo "ref=$REF"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Set up Android NDK
+        id: ndk
+        uses: nttld/setup-ndk@v1
+        with:
+          ndk-version: r26b
+
+      - name: Build all ABIs
+        env:
+          NDK: ${{ steps.ndk.outputs.ndk-path }}
+        run: bash scripts/build.sh
+
+      - name: Package module zip
+        run: |
+          set -euo pipefail
+          VERSION="${{ steps.meta.outputs.version }}"
+          STAGE="stage/module"
+          rm -rf stage
+          mkdir -p "$STAGE"
+          cp -r META-INF "$STAGE/"
+          cp customize.sh module.prop service.sh "$STAGE/"
+          cp build/main-* "$STAGE/"
+          ( cd "$STAGE" && zip -r9 "$GITHUB_WORKSPACE/RootSnitch-v${VERSION}.zip" . )
+          ls -lh "RootSnitch-v${VERSION}.zip"
+
+      - name: Publish GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.meta.outputs.ref }}
+          name: RootSnitch v${{ steps.meta.outputs.version }}
+          body_path: CHANGELOG.md
+          files: RootSnitch-v${{ steps.meta.outputs.version }}.zip
+          fail_on_unmatched_files: true
+
+      - name: Checkout main (for update.json)
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Write update.json
+        run: |
+          set -euo pipefail
+          VERSION="${{ steps.meta.outputs.version }}"
+          CODE="${{ steps.meta.outputs.version_code }}"
+          cat > update.json <<JSON
+          {
+            "version": "${VERSION}",
+            "versionCode": ${CODE},
+            "zipUrl": "https://github.com/null07089/RootSnitch/releases/download/v${VERSION}/RootSnitch-v${VERSION}.zip",
+            "changelog": "https://raw.githubusercontent.com/null07089/RootSnitch/main/CHANGELOG.md"
+          }
+          JSON
+          cat update.json
+
+      - name: Commit update.json to main
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add update.json
+          if git diff --cached --quiet; then
+            echo "update.json 无变化，跳过提交"
+          else
+            git commit -m "chore: 更新 update.json 至 v${{ steps.meta.outputs.version }}"
+            git push origin main
+          fi

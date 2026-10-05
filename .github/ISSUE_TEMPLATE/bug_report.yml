@@ -1,0 +1,63 @@
+name: Bug 报告
+description: 报告一个 Bug 或异常行为
+title: "[Bug] "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        感谢反馈！请尽量完整地填写以下信息，以便定位问题。
+  - type: input
+    id: module_version
+    attributes:
+      label: 模块版本
+      description: 在 Magisk 管理器或 module.prop 中查看
+      placeholder: "例如 v1.0 (versionCode 1)"
+    validations:
+      required: true
+  - type: input
+    id: android
+    attributes:
+      label: Android 版本
+      placeholder: "例如 Android 14 (API 34)"
+    validations:
+      required: true
+  - type: input
+    id: root
+    attributes:
+      label: Root 方案与版本
+      placeholder: "例如 Magisk v27.0 / KernelSU v0.9.5"
+    validations:
+      required: true
+  - type: input
+    id: device
+    attributes:
+      label: 设备型号
+      placeholder: "例如 Pixel 7"
+    validations:
+      required: false
+  - type: textarea
+    id: description
+    attributes:
+      label: 问题描述
+      description: 请描述发生了什么，以及你期望的结果
+    validations:
+      required: true
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: 复现步骤
+      placeholder: |
+        1. ……
+        2. ……
+        3. ……
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: 日志
+      description: 相关 logcat / Magisk 安装日志
+      render: shell
+    validations:
+      required: false

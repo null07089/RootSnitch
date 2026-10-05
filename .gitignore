@@ -1,0 +1,20 @@
+# 编译产物
+build/
+*.o
+*.so
+main
+main-arm64
+main-arm
+main-x64
+main-x86
+
+# Magisk 模块打包产物
+*.zip
+stage/
+
+# 编辑器 / 系统文件
+.DS_Store
+Thumbs.db
+*.swp
+.idea/
+.vscode/
